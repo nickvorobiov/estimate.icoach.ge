@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="/css/styles.css">
+  <title>iCoach estimate</title>
+</head>
+<body>
+
+<div id="app" class="container">
+  <h1 class="mt-4">План запуска</h1>
+
+  <table class="table">
+    <cols>
+      <col width="25%">
+      <col width="25%">
+      <col width="50%">
+    </cols>
+    <tr>
+      <td>Продающий первый шаг</td>
+      <td colspan="2">
+        <input type="radio" id="webinar" value="webinar" v-model="scheme">
+        <label for="webinar">Вебинар онлайн live</label>
+        <br>
+        <input type="radio" id="rec" value="rec" v-model="scheme">
+        <label for="rec">Вебинар / мастер-класс онлайн в записи</label>
+        <br>
+        <input type="radio" id="mk" value="mk" v-model="scheme">
+        <label for="mk">Оффлайн мастер-класс</label>
+        <br>
+        <input type="radio" id="consult" value="consult" v-model="scheme">
+        <label for="consult">Индивидуальная консультация</label>
+      </td>
+    </tr>
+    <tr>
+      <td>Пакеты <button @click="products.push({price:15000,quantity:0})" class="btn btn-link d-print-none">+ Add</button>
+      </td>
+      <td colspan="2">
+        <span class="d-block" v-for="product in products">
+          Цена $<input type="number" v-model.number="product.price">
+          <button @click="products.splice(products.indexOf(product), 1)" class="btn btn-link d-print-none">x Delete</button>
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3"><h3>Цель по продажам</h3></td>
+    </tr>
+    <tr>
+      <td>Всего продаж</td>
+      <td><input type="number" v-model.number="goalQuantity"></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Выручка</td>
+      <td>${{ formatPrice(amount) }}</td>
+      <td>
+        <span class="d-block" v-for="product in products">
+          Пакет за ${{ formatPrice(product.price) }} &times; {{ product.quantity }}&nbsp;шт. = ${{ formatPrice(product.price * product.quantity) }}
+        </span>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3"><h3>Рекламный бюджет</h3></td>
+    </tr>
+    <tr>
+      <td>Конверсия в продажу с первого шага</td>
+      <td><input type="number" v-model.number="cv">%</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Участников первого шага</td>
+      <td>{{ firstStep }}</td>
+      <td>{{ goalQuantity }} продаж / {{ cv }}% конверсии в продажу = {{ firstStep }}</td>
+    </tr>
+    <tr>
+      <td>Доходимость до первого шага</td>
+      <td><input type="number" v-model.number="cv1">%</td>
+      <td>Нормальная доходимость до {{ norm['genitive'][scheme] }} — {{ norm['cv1'][scheme] }}%</td>
+    </tr>
+    <tr>
+      <td>Заявок на первый шаг</td>
+      <td>{{ leads }}</td>
+      <td>{{ firstStep }} участников / {{ cv1 }}% доходимость = {{ leads }}</td>
+    </tr>
+    <tr>
+      <td>Цена заявки</td>
+      <td>$<input type="number" v-model.number="leadPrice"></td>
+      <td>Фактическая цена заявки определяется по результатам тестовой рекламной кампании</td>
+    </tr>
+    <tr>
+      <td>Рекламный бюджет</td>
+      <td>${{ formatPrice(budget) }}</td>
+      <td>{{ leads }} заявок &times; ${{ formatPrice(leadPrice) }} = ${{ formatPrice(budget) }}</td>
+    </tr>
+    <tr>
+      <td colspan="3"><h3>Срок</h3></td>
+    </tr>
+    <tr>
+      <td>Заявок в&nbsp;день</td>
+      <td><input type="number" v-model.number="speed"></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Дневной бюджет</td>
+      <td>${{ formatPrice(dailyBudget) }}</td>
+      <td>{{ speed }} заявок в&nbsp;день &times; ${{ formatPrice(leadPrice) }} = ${{ formatPrice(dailyBudget) }}</td>
+    </tr>
+    <tr>
+      <td>Длительность основной рекламной кампании</td>
+      <td>{{ duration }} дней</td>
+      <td>{{ leads }} заявок / {{ speed }} заявок в&nbsp;день = {{ duration }} дней</td>
+    </tr>
+    <!--tr>
+      <td>Дата начала сотрудничества</td>
+      <td><input v-model="startDate"></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Дата начала основной рекламной кампании</td>
+      <td>{{ adsStartDate }}</td>
+      <td>
+        <span class="d-block">7 дней на бриф, концепцию и видеоприглашение</span>
+        <span class="d-block">10 рабочих дней на изготовление рекламных материалов</span>
+        <span class="d-block">7 дней на тестовую рекламную кампанию</span>
+      </td>
+    </tr>
+    <tr>
+      <td>Дата окончания основной рекламной кампании</td>
+      <td>{{ adsFinishDate }}</td>
+      <td>{{ adsStartDate }} + {{ duration }}&nbsp;дней = {{ adsFinishDate }}</td>
+    </tr-->
+    <tr>
+      <td colspan="3"><h3>Эффективность</h3></td>
+    </tr>
+    <tr>
+      <td>Цена участника первого шага</td>
+      <td>${{ formatPrice(firstStepCost) }}</td>
+      <td>${{ formatPrice(budget) }} бюджет / {{ firstStep }} участников = ${{ formatPrice(firstStepCost) }}</td>
+    </tr>
+    <tr>
+      <td>Цена клиента</td>
+      <td>${{ formatPrice(clientCost) }}</td>
+      <td>${{ formatPrice(budget) }} бюджет / {{ goalQuantity }} продаж = ${{ formatPrice(clientCost) }}</td>
+    </tr>
+    <tr>
+      <td>Доля бюджета в&nbsp;выручке</td>
+      <td>{{ budgetShare }}%</td>
+      <td>${{ formatPrice(budget) }} бюджет / ${{ formatPrice(amount) }} выручка = {{ budgetShare }}%</td>
+    </tr>
+    <tr>
+      <td colspan="3"><h3>Расходы</h3></td>
+    </tr>
+    <tr>
+      <td>Общие расходы</td>
+      <td>$<input type="number" v-model.number="fixedExpense"></td>
+      <td>Оплата работ по ведению рекламной кампании и аренды площадки проведения мероприятия</td>
+    </tr>
+    <tr>
+      <td>Расходы на одного участника</td>
+      <td>$<input type="number" v-model.number="variableExpense"></td>
+      <td>Оплата кофе-брейков для живых мероприятий и проживания участников для выездных мероприятий</td>
+    </tr>
+    <tr>
+      <td>Итого расходы</td>
+      <td>${{ formatPrice(expense) }}</td>
+      <td>${{ formatPrice(fixedExpense) }} общие расходы + (${{ formatPrice(variableExpense) }} расходы на одного участника &times; {{ goalQuantity }} участников)</td>
+    </tr>
+    <tr>
+      <td colspan="3"><h3>Прибыль</h3></td>
+    </tr>
+    <tr>
+      <td>Ставка налога</td>
+      <td><input type="number" v-model.number="tax">%</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Налог</td>
+      <td>${{ formatPrice(taxAmount) }}</td>
+      <td>${{ formatPrice(amount) }} выручка &times; {{ tax }}% ставка налога</td>
+    </tr>
+    <tr>
+      <td>Выручка после налогов</td>
+      <td>${{ formatPrice(cleanedAmount) }}</td>
+      <td>${{ formatPrice(amount) }} выручка - ${{ formatPrice(taxAmount) }} налог</td>
+    </tr>
+    <tr>
+      <td>Маркетинговая прибыль</td>
+      <td>${{ formatPrice(marketingRevenue) }}</td>
+      <td>${{ formatPrice(cleanedAmount) }} выручка после налогов - ${{ formatPrice(budget) }} бюджет - ${{ formatPrice(expense) }} расходы = ${{ formatPrice(marketingRevenue) }}</td>
+    </tr>
+    <tr v-if="bonus >= 0">
+      <td>Вознаграждение продюсера</td>
+      <td>${{ formatPrice(bonus) }}</td>
+      <td>${{ formatPrice(marketingRevenue) }} маркетинговая прибыль &times; 30% = ${{ formatPrice(bonus) }}</td>
+    </tr>
+    <tr v-if="bonus >= 0">
+      <td>Чистая прибыль</td>
+      <td>${{ formatPrice(profit) }}</td>
+      <td>${{ formatPrice(marketingRevenue) }} маркетинговая прибыль - ${{ formatPrice(bonus) }} вознаграждение продюсера = ${{ formatPrice(profit) }}</td>
+    </tr>
+  </table>
+  <p>Расчёты основаны на средних данных и соответствие реальных данных плановым не гарантируется. Реальные результаты зависят от результатов тестов, поведения аудитории, и качества проведённого первого шага.</p>
+  <p>«Утверждаю»</p>
+  <p>Автор________________________________________________________________ «___________»__________________________ 2018 г.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="/js/moment-with-locales.min.js"></script>
+<script src="/js/momentjs-business.js"></script>
+<script type="text/javascript">
+var app = new Vue({
+  el: '#app',
+  data: {
+    scheme: 'webinar',
+    products: [
+      {
+        price: 250,
+        quantity: 0
+      }
+    ],
+    goalQuantity: 50,
+    cv: 20,
+    cv1: 30,
+    leadPrice: 3,
+    speed: 10,
+    fixedExpense: 200,
+    variableExpense: 0,
+    tax: 0,
+    startDate: moment().format('YYYY-MM-DD'),
+    norm: {
+      cv: {
+        'webinar': 20,
+        'rec': 10,
+        'mk': 20,
+        'consult': 20
+      },
+      cv1: {
+        'webinar': 30,
+        'rec': 80,
+        'mk': 50,
+        'consult': 80
+      },
+      genitive: {
+        'webinar': 'вебинара',
+        'rec': 'записи',
+        'mk': 'мастер-класса',
+        'consult': 'консультации'
+      }
+    }
+  },
+  computed: {
+    amount: function() {
+      return this.products.reduce(function(sum, item){
+        return sum + (item.price * item.quantity)
+      }, 0);
+    },
+    firstStep: function() {
+      return Math.round(this.goalQuantity / (this.cv / 100))
+    },
+    leads: function() {
+      return Math.round(this.firstStep / (this.cv1 / 100))
+    },
+    budget: function() {
+      return this.leads * this.leadPrice
+    },
+    duration: function() {
+      return Math.ceil(this.leads / this.speed)
+    },
+    adsStartDate: function() {
+      return moment(this.startDate).add(14, 'days').businessAdd(10).format('YYYY-MM-DD')
+    },
+    adsFinishDate: function() {
+      return moment(this.adsStartDate).add(this.duration, 'days').format('YYYY-MM-DD')
+    },
+    dailyBudget: function() {
+      return this.speed * this.leadPrice
+    },
+    firstStepCost: function() {
+      return Math.round(this.budget / this.firstStep)
+    },
+    clientCost: function() {
+      return Math.round(this.budget / this.goalQuantity)
+    },
+    expense: function() {
+      return this.fixedExpense + (this.variableExpense * this.goalQuantity)
+    },
+    taxAmount: function() {
+      return Math.round(this.amount * this.tax / 100)
+    },
+    cleanedAmount: function() {
+      return this.amount - this.taxAmount
+    },
+    marketingRevenue: function() {
+      return this.cleanedAmount - this.budget - this.expense
+    },
+    budgetShare: function() {
+      return Math.round(this.budget / this.amount * 100)
+    },
+    bonus: function() {
+      return Math.round(this.marketingRevenue * 30 / 100)
+    },
+    profit: function() {
+      return this.marketingRevenue - this.bonus
+    }
+  },
+  watch: {
+    scheme: function(newValue, oldValue) {
+      this.cv = this.norm['cv'][newValue];
+      this.cv1 = this.norm['cv1'][newValue];
+    },
+    goalQuantity: function(newValue, oldValue) {
+      this.calc();
+    },
+    products: {
+      handler: function(newValue, oldValue) {
+        this.calc();
+      },
+      deep: true
+    }
+  },
+  methods: {
+    formatPrice(value) {
+      let val = (value/1)//.toFixed(2).replace('.', ',')
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, String.fromCharCode(0x202F))
+    }
+  }
+});
+app.calc = function(){
+  // считаем долю каждого продукта исходя из цели по продажам
+  var goalQuantity = this.goalQuantity;
+  var totalPrice = this.products.reduce(function(sum, item){
+    return sum + item.price
+  }, 0);
+
+  var totalShare = 0;
+  this.products.map(function(product){
+    product.share = totalPrice / product.price;
+    totalShare = totalShare + product.share;
+  })
+
+  var totalQuantity = goalQuantity;
+  for (var i = this.products.length - 1; i >= 0; i--) {
+    var q;
+    q = Math.round(goalQuantity / totalShare * this.products[i].share);
+    totalQuantity = totalQuantity - q;
+    if (i == 0 && totalQuantity !== 0) {
+      q = q + totalQuantity;
+    }
+    this.products[i].quantity = q;
+  }
+};
+app.calc();
+</script>
+
+</body>
+</html>
